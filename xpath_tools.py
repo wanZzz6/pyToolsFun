@@ -1,3 +1,4 @@
+from lxml import etree
 
 def get_full_xpath(self, node, position=False, class_=False, id_=False): 
     ''' 取得节点完整xapth路径，选择是否包含位置，class，id属性'''
@@ -28,3 +29,9 @@ def get_text_all(etree_node,space = ''):
         if i.tail and i.tail.strip():
              all_text += i.tail.strip() + space
     return all_text.strip()
+
+'''
+res = requests.get('https://www.baidu.com')
+tree = etree.HTML(res.text)
+
+'''
