@@ -1,5 +1,0 @@
-def find_href_src(html_str):
-    '''提取页面所有连接，并用集合去重'''
-    href = set(i for i in re.findall (r'href\s*=[\'\"]([^\'\">]*)[\'\"][^>]*>', html_str) if  'javascript' not in i and not i.strip().startswith('#'))
-    src =set(a.strip('url()') for a in  re.findall(r'src=\s*[\"\']([^\"\'>]+)[\'\"]', html_str))
-    return href | src
