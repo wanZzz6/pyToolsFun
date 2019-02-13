@@ -1,5 +1,6 @@
 import requests
 from urllib import parse
+from requests.utils import urlparse
 import time
 import re
 import os
@@ -17,15 +18,15 @@ def request_url(url, header={}, verify=False, timeout=5):
         if res.status_code < 400:
             print('Request Success!', end='---')
             return res
+        raise Exception
     except Exception as e:
         print('Request Error!!!', e)
         fail_url.add(url)
 
-
 def find_href_src(html_str):
     '''提取页面所有连接，并用集合去重'''
     href = set(i for i in re.findall(r'href\s*=[\'\"]([^\'\">]*)[\'\"][^>]*>', html_str) if
-               'javascript' not in i and not i.strip().startswith('#'))
+               'javascript' not in i and urlparse(i).fragment == '')
     src = set(a.strip('url()') for a in re.findall(r'src=\s*[\"\']([^\"\'>]+)[\'\"]', html_str))
     return href | src
 
