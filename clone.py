@@ -16,12 +16,13 @@ def request_url(url, header={}, verify=False, timeout=5):
         print('正在请求-->', url)
         res = session.get(url, headers=header, verify=verify, timeout=timeout)
         if res.status_code < 400:
-            print('Request Success!', end='---')
+            print('Request Success!', end='--')
             return res
-        raise Exception
+        raise Exception('Status Code:', res.status_code)
     except Exception as e:
         print('Request Error!!!', e)
         fail_url.add(url)
+
 
 def find_href_src(html_str):
     '''提取页面所有连接，并用集合去重'''
@@ -49,8 +50,8 @@ def replace_str(raw_str):
 def url2local(url):
     '''将url 转换成本地文件名，没有后缀的连接，添加指定的后缀
     '''
-    # 去请求参数
-    temp = parse.splitquery(url)[0]
+    # 取url路径
+    temp = urlparse(url).path
     # 分割
     temp = re.split('[\/]', temp)
     # 拼接
@@ -107,8 +108,11 @@ def save_source(str_or_byte, without_domain_url, source_type="str", encoding='ut
 def downloadPage(url):
     '''保存页面并收集新的url
      '''
-    full_url = domain + url
-    res = request_url(full_url, header=header)
+    if not url.startswith('http'):
+        full_url = domain + url
+    else:
+        full_url = url
+    res = request_url(full_url, header=header, timeout=timeout)
     if res:
         #  判断是文本还是 媒体文件
         source_type = 'byte' if res.encoding == None else 'str'
@@ -163,34 +167,35 @@ def exit(have_crawl, uncrawl, out_link):
 
 if __name__ == "__main__":
 
-    os.chdir(r'C:\Users\wanzheng\Desktop\B')
+    os.chdir(r'C:\Users\wanzheng\Desktop\D')
     # 已经爬取、未爬取 url
     have_crawl, uncrawl = init()
     # 爬取失败的 url
     fail_url = set()
     # 外链
     out_link = set()
+    # 请求超时时间
+    timeout = 20
     # 每个请求间隔
     sleep = 1
     # 页面内容替换规则
     suffix = '.html'
     replace_rules = []
 
+    #  域名（末尾有斜杠）
+    domain = 'https://templated.co/items/demos/caminar/'
+    # 起始网页
+    start = 'https://templated.co/items/demos/caminar/'
     header = {
         'User-Agent':
             'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
-        'Referer': 'http://blog.mtianyan.cn/',
+        'Referer': domain,
         #         'Connection': 'keep-alive',
     }
-    #     域名（末尾有斜杠）
-    #     domain = 'http://www.17sucai.com/preview/356806/2017-07-14/homedown/'
-    domain = 'http://blog.mtianyan.cn/'
-    # 起始位置（开头无斜杠）
-    start = 'categories/Django-Xadmin打造在线教育平台/'
+    session = requests.Session()
 
     uncrawl.add(start)
     print('待爬取%d, 已爬取%d' % (len(uncrawl), len(have_crawl)))
-    session = requests.Session()
 
     try:
         while uncrawl:
