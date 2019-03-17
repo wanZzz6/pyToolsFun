@@ -167,7 +167,7 @@ def exit(have_crawl, uncrawl, out_link):
 
 if __name__ == "__main__":
 
-    os.chdir(r'C:\Users\wanzheng\Desktop\D')
+    os.chdir(r'C:\Users\xxxx\Desktop\D')
     # 已经爬取、未爬取 url
     have_crawl, uncrawl = init()
     # 爬取失败的 url
